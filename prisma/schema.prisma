@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model WikidataSearch {
+  query     String   @id
+  results   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WikidataPerson {
+  id               String  @id
+  name             String
+  description      String
+  imageUrl         String?
+  listEntriesCount Int     @default(0)
+
+  listEntries ListEntry[]
+}
+
+model CustomPerson {
+  id               Int     @id @default(autoincrement())
+  name             String
+  description      String
+  imageUrl         String?
+  listEntriesCount Int     @default(0)
+
+  listEntries ListEntry[]
+
+  @@index([name])
+}
+
+model List {
+  id          Int      @id @default(autoincrement())
+  name        String
+  accessToken String
+  createdAt   DateTime @default(now())
+
+  entries ListEntry[]
+}
+
+model ListEntry {
+  id               Int     @id @default(autoincrement())
+  description      String?
+  position         Int
+  customPersonId   Int?
+  wikidataPersonId String?
+  listId           Int
+
+  customPerson   CustomPerson?   @relation(fields: [customPersonId], references: [id])
+  wikidataPerson WikidataPerson? @relation(fields: [wikidataPersonId], references: [id])
+  list           List            @relation(fields: [listId], references: [id])
+}
