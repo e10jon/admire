@@ -1,8 +1,7 @@
-import ThemeProvider from '@mui/material/styles/ThemeProvider'
-import CssBaseline from '@mui/material/CssBaseline'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { ProvideTheme } from './components/provide-theme'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,10 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <ThemeProvider theme={{}}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
+        <ProvideTheme>{children}</ProvideTheme>
       </body>
     </html>
   )
