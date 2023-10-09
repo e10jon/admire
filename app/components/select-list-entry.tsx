@@ -3,6 +3,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Combobox } from '@headlessui/react'
 import { Result } from '@/app/server/wikidata-api'
+import classNames from 'classnames'
 import debounce from 'lodash/debounce'
 
 export default function SelectListEntry({ position }: { position: number }) {
@@ -10,6 +11,7 @@ export default function SelectListEntry({ position }: { position: number }) {
   const [query, setQuery] = useState('')
   const [people, setPeople] = useState<Result | null>(null)
   const [fetching, setFetching] = useState<boolean>(false)
+  const [addPersonMode, setAddPersonMode] = useState(false)
 
   const debouncedSetQuery = useRef(
     debounce<(event: ChangeEvent<HTMLInputElement>) => void>((event) => {
@@ -40,35 +42,87 @@ export default function SelectListEntry({ position }: { position: number }) {
     <div>
       <span>{position}</span>
 
-      {person ? (
-        <span>
-          Selected {person.name}{' '}
-          <button type='button' onClick={() => setPerson(null)}>
-            Remove
-          </button>
-        </span>
-      ) : (
-        <Combobox value={person} onChange={setPerson}>
-          <Combobox.Input onChange={debouncedSetQuery} className='border' />
-          {fetching && 'Fetching...'}
+      {(() => {
+        if (addPersonMode)
+          return (
+            <>
+              <form>
+                <div>
+                  <label>Name</label>
+                  <input name='name' />
+                </div>
 
-          <Combobox.Options>
-            {(() => {
-              if (people === null) return
+                <div>
+                  <label>Description</label>
+                  <input name='description' />
+                </div>
+              </form>
 
-              if (people.length > 0)
-                return people.map((person) => (
-                  <Combobox.Option key={person.id} value={person} className='border'>
-                    <span>{person.name} </span>
-                    <span className='text-sm text-slate-500'>{person.description}</span>
-                  </Combobox.Option>
-                ))
+              <button type='button' onClick={() => setAddPersonMode(false)}>
+                Cancel
+              </button>
+            </>
+          )
 
-              return <div>No results!</div>
-            })()}
-          </Combobox.Options>
-        </Combobox>
-      )}
+        if (person)
+          return (
+            <span>
+              Selected {person.name}{' '}
+              <button type='button' onClick={() => setPerson(null)}>
+                Remove
+              </button>
+            </span>
+          )
+
+        return (
+          <Combobox value={person} onChange={setPerson}>
+            <Combobox.Input onChange={debouncedSetQuery} className='border' />
+            {fetching && 'Fetching...'}
+
+            <Combobox.Options>
+              {(() => {
+                if (people === null) return
+
+                if (people.length > 0)
+                  return people
+                    .map((person) => (
+                      <Combobox.Option key={person.id} value={person} className='border'>
+                        {({ active }) => (
+                          <div className={classNames(active && 'bg-yellow-50')}>
+                            <span>{person.name} </span>
+                            <span className='text-sm text-slate-500'>{person.description}</span>
+                          </div>
+                        )}
+                      </Combobox.Option>
+                    ))
+                    .concat(
+                      <div>
+                        <button type='button' onClick={() => setAddPersonMode(true)}>
+                          Add your own
+                        </button>
+                      </div>
+                    )
+
+                return (
+                  <div>
+                    No results!{' '}
+                    <button type='button' onClick={() => setAddPersonMode(true)}>
+                      Add your own
+                    </button>
+                  </div>
+                )
+              })()}
+            </Combobox.Options>
+          </Combobox>
+        )
+      })()}
+
+      {person || addPersonMode ? (
+        <div>
+          <label>Reason</label>
+          <input name='reason' />
+        </div>
+      ) : null}
     </div>
   )
 }
