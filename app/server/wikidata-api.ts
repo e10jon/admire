@@ -1,5 +1,3 @@
-import { inspect } from 'util'
-
 export const query = async (name: string) => {
   const sparqlQuery = `SELECT (SAMPLE(?item) as ?item) (SAMPLE(?itemLabel) as ?itemLabel) (SAMPLE(?itemDescription) as ?itemDescription) (MIN(?image) as ?mainImage) WHERE {
   SERVICE wikibase:mwapi {
@@ -43,6 +41,4 @@ LIMIT 20`
   }))
 }
 
-const deepLog = (data: unknown) => console.log(inspect(data, false, null, true))
-
-query('jay-z').then(deepLog)
+export type Result = Awaited<ReturnType<typeof query>>
