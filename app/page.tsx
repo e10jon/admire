@@ -1,58 +1,33 @@
 'use client'
 
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { Combobox } from '@headlessui/react'
-import { Result } from '@/app/server/wikidata-api'
-import debounce from 'lodash/debounce'
+import SelectListEntry from './components/select-list-entry'
+import times from 'lodash/times'
+import { useState } from 'react'
 
 export default function Home() {
-  const [person, setPerson] = useState<Result[number] | null>(null)
-  const [query, setQuery] = useState('')
-  const [people, setPeople] = useState<Result | null>(null)
-  const [fetching, setFetching] = useState<boolean>(false)
-
-  const debouncedSetQuery = useRef(
-    debounce<(event: ChangeEvent<HTMLInputElement>) => void>((event) => {
-      setQuery(event.target.value)
-    }, 300)
-  ).current
-
-  useEffect(() => {
-    const path = `/api/people?name=${query}`
-    console.log(`Fetching ${path}`)
-    setFetching(true)
-    fetch(path)
-      .then((res) => res.json() as unknown as { people: Result })
-      .then((res) => {
-        setPeople(res.people)
-      })
-      .finally(() => {
-        setFetching(false)
-      })
-  }, [query])
+  const [numEntries, setNumEntries] = useState(1)
 
   return (
-    <div>
-      <Combobox value={person} onChange={setPerson}>
-        <Combobox.Input onChange={debouncedSetQuery} className='border' />
-        <Combobox.Options>
-          {(() => {
-            if (people === null) return
-            if (people.length > 0)
-              return people.map((person) => (
-                <Combobox.Option key={person.id} value={person} className='border'>
-                  <span>{person.name} </span>
-                  <span className='text-sm text-slate-500'>{person.description}</span>
-                </Combobox.Option>
-              ))
-            return <div>No results!</div>
-          })()}
-        </Combobox.Options>
-      </Combobox>
+    <>
+      <div>
+        {times(numEntries).map((_, index) => (
+          <SelectListEntry key={index} position={index + 1} />
+        ))}
+      </div>
 
-      {fetching && 'Fetching...'}
+      <div>
+        {numEntries <= 20 && (
+          <button type='button' onClick={() => setNumEntries(numEntries + 1)}>
+            Add entry
+          </button>
+        )}
 
-      {person && `Selected ${person.name}`}
-    </div>
+        {numEntries > 1 && (
+          <button type='button' onClick={() => setNumEntries(numEntries - 1)}>
+            Remove entry
+          </button>
+        )}
+      </div>
+    </>
   )
 }
