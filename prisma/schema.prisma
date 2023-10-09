@@ -43,9 +43,12 @@ model List {
   id          Int      @id @default(autoincrement())
   name        String
   accessToken String
+  ipAddress   String
+  likesCount  Int      @default(0)
   createdAt   DateTime @default(now())
 
   entries ListEntry[]
+  likes   Like[]
 }
 
 model ListEntry {
@@ -59,4 +62,15 @@ model ListEntry {
   customPerson   CustomPerson?   @relation(fields: [customPersonId], references: [id])
   wikidataPerson WikidataPerson? @relation(fields: [wikidataPersonId], references: [id])
   list           List            @relation(fields: [listId], references: [id])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  ipAddress String
+  listId    Int
+  createdAt DateTime @default(now())
+
+  list List @relation(fields: [listId], references: [id])
+
+  @@unique([listId, ipAddress])
 }
