@@ -6,7 +6,7 @@ import { Result } from '@/app/server/wikidata-api'
 import classNames from 'classnames'
 import debounce from 'lodash/debounce'
 
-export default function SelectListEntry({ position }: { position: number }) {
+export default function SelectListEntry({ position, className }: { position: number; className?: string }) {
   const [person, setPerson] = useState<Result[number] | null>(null)
   const [query, setQuery] = useState('')
   const [people, setPeople] = useState<Result | null>(null)
@@ -39,8 +39,8 @@ export default function SelectListEntry({ position }: { position: number }) {
   }, [query])
 
   return (
-    <div>
-      <span>{position}</span>
+    <div className={className}>
+      <span className='pr-2'>{position}.</span>
 
       {(() => {
         if (addPersonMode)
@@ -48,17 +48,17 @@ export default function SelectListEntry({ position }: { position: number }) {
             <>
               <form>
                 <div>
-                  <label>Name</label>
-                  <input name='name' />
+                  <label>Name: </label>
+                  <input name='name' className='border' />
                 </div>
 
                 <div>
-                  <label>Description</label>
-                  <input name='description' />
+                  <label>Description: </label>
+                  <input name='description' className='border' />
                 </div>
               </form>
 
-              <button type='button' onClick={() => setAddPersonMode(false)}>
+              <button type='button' onClick={() => setAddPersonMode(false)} className='underline'>
                 Cancel
               </button>
             </>
@@ -68,7 +68,7 @@ export default function SelectListEntry({ position }: { position: number }) {
           return (
             <span>
               Selected {person.name}{' '}
-              <button type='button' onClick={() => setPerson(null)}>
+              <button type='button' onClick={() => setPerson(null)} className='underline'>
                 Remove
               </button>
             </span>
@@ -76,7 +76,7 @@ export default function SelectListEntry({ position }: { position: number }) {
 
         return (
           <Combobox value={person} onChange={setPerson}>
-            <Combobox.Input onChange={debouncedSetQuery} className='border' />
+            <Combobox.Input onChange={debouncedSetQuery} className='border' placeholder='Search for a name...' />
             {fetching && 'Fetching...'}
 
             <Combobox.Options>
@@ -98,7 +98,7 @@ export default function SelectListEntry({ position }: { position: number }) {
                     .concat(
                       <div>
                         <button type='button' onClick={() => setAddPersonMode(true)}>
-                          Add your own
+                          + Add a person
                         </button>
                       </div>
                     )
@@ -107,7 +107,7 @@ export default function SelectListEntry({ position }: { position: number }) {
                   <div>
                     No results!{' '}
                     <button type='button' onClick={() => setAddPersonMode(true)}>
-                      Add your own
+                      + Add a person
                     </button>
                   </div>
                 )
@@ -119,8 +119,8 @@ export default function SelectListEntry({ position }: { position: number }) {
 
       {person || addPersonMode ? (
         <div>
-          <label>Reason</label>
-          <input name='reason' />
+          <label>Enter a brief reason why you chose this person: </label>
+          <input name='reason' className='border' />
         </div>
       ) : null}
     </div>
