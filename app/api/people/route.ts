@@ -6,6 +6,9 @@ export type Result = WikidataPerson & { isCustom?: boolean }
 
 export async function GET(request: Request) {
   let people: Result[] = []
+  const addPeople = (newPeople: Result[], isCustom: boolean) => {
+    people = people.concat(newPeople.map((r) => ({ ...r, isCustom })))
+  }
   const respond = () => Response.json({ people })
 
   const url = new URL(request.url)
@@ -27,20 +30,20 @@ export async function GET(request: Request) {
   const existingWikidataPeopleRows = await prisma.wikidataPerson.findMany({
     where: { id: { in: searchRow.resultsParsed.map((p) => p.id) } },
   })
-  people = people.concat(existingWikidataPeopleRows.map((r) => ({ ...r, isCustom: false })))
+  addPeople(existingWikidataPeopleRows, false)
   const existingIds = existingWikidataPeopleRows.map((r) => r.id)
   const newWikidataPeopleRows = await Promise.all(
     searchRow.resultsParsed.filter((r) => !existingIds.includes(r.id)).map((data) => prisma.wikidataPerson.create({ data }))
   )
-  people = people.concat(newWikidataPeopleRows.map((r) => ({ ...r, isCustom: false })))
+  addPeople(newWikidataPeopleRows, false)
 
   // add custom people
   const customPeopleRows = await prisma.customPerson.findMany({
     where: { name: { startsWith: name } },
-    take: 100,
     orderBy: { listEntriesCount: 'asc' },
+    take: 100,
   })
-  people = people.concat(customPeopleRows.map((r) => ({ ...r, isCustom: true })))
+  addPeople(customPeopleRows, true)
 
   return respond()
 }

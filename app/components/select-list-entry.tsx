@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Combobox } from '@headlessui/react'
+import Image from 'next/image'
 import { Result } from '@/app/server/wikidata-api'
 import classNames from 'classnames'
 import debounce from 'lodash/debounce'
@@ -89,6 +90,9 @@ export default function SelectListEntry({ position, className }: { position: num
                       <Combobox.Option key={person.id} value={person} className='border'>
                         {({ active }) => (
                           <div className={classNames(active && 'bg-yellow-50')}>
+                            {person.imageUrl && (
+                              <Image src={person.imageUrl} alt={person.name} width={30} height={30} className='inline pr-1' />
+                            )}
                             <span>{person.name} </span>
                             <span className='text-sm text-slate-500'>{person.description}</span>
                           </div>
@@ -106,8 +110,8 @@ export default function SelectListEntry({ position, className }: { position: num
                 return (
                   <div>
                     No results!{' '}
-                    <button type='button' onClick={() => setAddPersonMode(true)}>
-                      + Add a person
+                    <button type='button' onClick={() => setAddPersonMode(true)} className='underline'>
+                      Add a person
                     </button>
                   </div>
                 )
