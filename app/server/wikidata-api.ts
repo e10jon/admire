@@ -1,4 +1,15 @@
-export const query = async (name: string) => {
+import { z } from 'zod'
+
+export const resultSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+})
+
+export type Result = z.infer<typeof resultSchema>
+
+export const query = async (name: string): Promise<Result[]> => {
   const sparqlQuery = `SELECT (SAMPLE(?item) as ?item) (SAMPLE(?itemLabel) as ?itemLabel) (SAMPLE(?itemDescription) as ?itemDescription) (MIN(?image) as ?mainImage) WHERE {
   SERVICE wikibase:mwapi {
     bd:serviceParam wikibase:api "EntitySearch" .
@@ -40,5 +51,3 @@ LIMIT 20`
     imageUrl: b.mainImage?.value,
   }))
 }
-
-export type Result = Awaited<ReturnType<typeof query>>

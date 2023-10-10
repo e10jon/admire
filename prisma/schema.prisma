@@ -18,21 +18,23 @@ model WikidataSearch {
 }
 
 model WikidataPerson {
-  id               String  @id
+  id               String   @id
   name             String
   description      String
   imageUrl         String?
-  listEntriesCount Int     @default(0)
+  listEntriesCount Int      @default(0)
+  createdAt        DateTime @default(now())
 
   listEntries ListEntry[]
 }
 
 model CustomPerson {
-  id               Int     @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   name             String
   description      String
   imageUrl         String?
-  listEntriesCount Int     @default(0)
+  listEntriesCount Int      @default(0)
+  createdAt        DateTime @default(now())
 
   listEntries ListEntry[]
 

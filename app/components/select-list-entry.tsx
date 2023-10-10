@@ -7,9 +7,9 @@ import classNames from 'classnames'
 import debounce from 'lodash/debounce'
 
 export default function SelectListEntry({ position, className }: { position: number; className?: string }) {
-  const [person, setPerson] = useState<Result[number] | null>(null)
+  const [person, setPerson] = useState<Result | null>(null)
   const [query, setQuery] = useState('')
-  const [people, setPeople] = useState<Result | null>(null)
+  const [people, setPeople] = useState<Result[] | null>(null)
   const [fetching, setFetching] = useState<boolean>(false)
   const [addPersonMode, setAddPersonMode] = useState(false)
 
@@ -29,7 +29,7 @@ export default function SelectListEntry({ position, className }: { position: num
     console.log(`Fetching ${path}`)
     setFetching(true)
     fetch(path)
-      .then((res) => res.json() as unknown as { people: Result })
+      .then((res) => res.json() as unknown as { people: Result[] })
       .then((res) => {
         setPeople(res.people)
       })
