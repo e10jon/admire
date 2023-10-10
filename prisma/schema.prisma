@@ -18,9 +18,9 @@ model WikidataSearch {
 }
 
 model WikidataPerson {
-  id               String   @id
+  id               Int      @id
   name             String
-  description      String
+  description      String?
   imageUrl         String?
   listEntriesCount Int      @default(0)
   createdAt        DateTime @default(now())
@@ -31,7 +31,7 @@ model WikidataPerson {
 model CustomPerson {
   id               Int      @id @default(autoincrement())
   name             String
-  description      String
+  description      String?
   imageUrl         String?
   listEntriesCount Int      @default(0)
   createdAt        DateTime @default(now())
@@ -58,7 +58,7 @@ model ListEntry {
   description      String?
   position         Int
   customPersonId   Int?
-  wikidataPersonId String?
+  wikidataPersonId Int?
   listId           Int
 
   customPerson   CustomPerson?   @relation(fields: [customPersonId], references: [id])

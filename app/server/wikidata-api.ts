@@ -3,8 +3,8 @@ import { z } from 'zod'
 export const resultSchema = z.object({
   id: z.number(),
   name: z.string(),
-  description: z.string().optional(),
-  imageUrl: z.string().optional(),
+  description: z.string().nullish(),
+  imageUrl: z.string().nullish(),
 })
 
 export type Result = z.infer<typeof resultSchema>

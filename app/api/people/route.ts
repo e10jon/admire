@@ -24,7 +24,15 @@ export async function GET(request: Request) {
   }
 
   // find or create the wikidataPeople
-  // TODO
+  const existingWikidataPeopleRows = await prisma.wikidataPerson.findMany({
+    where: { id: { in: searchRow.resultsParsed.map((p) => p.id) } },
+  })
+  people = people.concat(existingWikidataPeopleRows.map((r) => ({ ...r, isCustom: false })))
+  const existingIds = existingWikidataPeopleRows.map((r) => r.id)
+  const newWikidataPeopleRows = await Promise.all(
+    searchRow.resultsParsed.filter((r) => !existingIds.includes(r.id)).map((data) => prisma.wikidataPerson.create({ data }))
+  )
+  people = people.concat(newWikidataPeopleRows.map((r) => ({ ...r, isCustom: false })))
 
   // add custom people
   const customPeopleRows = await prisma.customPerson.findMany({
@@ -32,9 +40,7 @@ export async function GET(request: Request) {
     take: 100,
     orderBy: { listEntriesCount: 'asc' },
   })
-  for (const customPerson of customPeopleRows) {
-    // TODO:
-  }
+  people = people.concat(customPeopleRows.map((r) => ({ ...r, isCustom: true })))
 
   return respond()
 }
